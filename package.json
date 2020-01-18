@@ -1,0 +1,23 @@
+{
+  "author": {
+    "name": "Jonathan Annett",
+    "url": "http://github.com/jonathan-annett",
+    "email": "jonathan.max.annett@gmail.com"
+  },
+  "contributors": [],
+  "description": "javascript polyfills used by various projects",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "keywords": [
+  ],
+  "main": "src/polyfills.js",
+  "name": "jspolyfills",
+  "repository": {
+    "url": "https://github.com/jonathan-annett/jspolyfills",
+    "type": "git"
+  },
+  "version": "0.0.1"
+}
