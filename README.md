@@ -14,13 +14,14 @@ includes polyfills for:
 also, not strictly polyfills...
 interally adds the following extensions to Object:
 * Object.jsClass
-* Object.polyfills
+* Object.polyfill
 * Object.env
   + Object.env.isNode   **true if this code is in node.js**
 
 also defines:
 * RegExp.split(haystack, needle, limit, map)
-        This is the implementation of split which is called by String.prototype.split when the "needle" parameter is a RegExp object
+  + This is the implementation of split which is called by String.prototype.split when the "needle" parameter is a RegExp object
+  + the map param is an optional callback to allow each split delimiter to be inspected as it is found. callback is similar to that used by Array.prototype.map()
 
 may also define
 * String.split(haystack,needle,limit)
