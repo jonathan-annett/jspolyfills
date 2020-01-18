@@ -9,7 +9,7 @@ includes polyfills for:
 * Array.prototype.flat
 * String.prototype.split(RegExp)
 * String.prototype.includes
-* Proxy (from [es6-proxy-polyfill](https://github.com/ambit-tsai/es6-proxy-polyfill)
+* Proxy (from [es6-proxy-polyfill](https://github.com/ambit-tsai/es6-proxy-polyfill) )
 
 also, not strictly polyfills...
 interally adds the following extensions to Object:
