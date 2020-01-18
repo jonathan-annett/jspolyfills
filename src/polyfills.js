@@ -492,7 +492,7 @@ var inclusionsBegin;
         jsClass.getTest=function(o){
             var txt=s(o),test=txt.startsWith.bind(txt);
             return function(x) {return test(s(x));};
-        };//var isRE=jsClass.getTest(/\s/); isRE("some string")===true
+        };//var isRE=jsClass.getTest(/\s/); isRE(/some-regexp/g)===true
         jsClass.is=function (x,c){return s(x).search(c)>0;};//jsClass.is([],'Array')---> true
         //bootstap the polyfiller by adding polyfill and jsClass to Object
         cl=isNode && ["polyfills","extensions"].some(function(file){
