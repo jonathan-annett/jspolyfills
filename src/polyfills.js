@@ -48,25 +48,6 @@ var inclusionsBegin;
 
     function Function_polyfills(func) {
         func("args",(function(s) {
-
-
-          function useArrayFrom () {
-              try {
-                  if (typeof Array.from==='function'){
-                      var x = (function (){return Array.from(arguments);})(1,2,3);
-                      if (x.length===3) {
-                         return x[0]===1 && x[1]===2 && x[2]===3;
-                      }
-                  }
-              } catch (e) {
-
-              }
-              return false;
-          }
-          if (useArrayFrom()) {
-              return Array.from;
-          }
-
           return s.call.bind(s);
       })(Array.prototype.slice));
     }
@@ -305,7 +286,6 @@ var inclusionsBegin;
               //undef
           );
     }
-
 
     function Proxy_polyfill(){
         /**
