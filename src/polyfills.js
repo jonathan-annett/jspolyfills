@@ -474,7 +474,6 @@ var inclusionsBegin;
             return function(x) {return test(s(x));};
         };//var isRE=jsClass.getTest(/\s/); isRE(/some-regexp/g)===true
         jsClass.is=function (x,c){return s(x).search(c)>0;};//jsClass.is([],'Array')---> true
-        //bootstap the polyfiller by adding polyfill and jsClass to Object
         cl=isNode && ["polyfills","extensions"].some(function(file){
             return module.filename.endsWith("/"+file+".js")||
                    module.filename.endsWith("/"+file+".min.js")
@@ -482,8 +481,10 @@ var inclusionsBegin;
             ;});
         v=isNode && (cl||!process.mainModule)  && process.argv.indexOf("--verbose")>=0;
         L=v?console.log.bind(console):function(){};
+        //bootstap the polyfiller by adding polyfill and jsClass to Object
         polyfills(Object,function(object){
             object("polyfill",polyfills);
+            object("notifyPollyfill",notifyPollyfill);
             object("jsClass",jsClass);
             object("@env",
             function getEnv (){
@@ -495,6 +496,14 @@ var inclusionsBegin;
             });
         });
         return jsClass;
+
+        function notifyPollyfill(file,polyfills){
+            if (isNode) {
+                process.emit(polyfills||'polyfills',{file:file});
+            } else {
+                window.dispatchEvent(new CustomEvent(polyfills||'polyfills', { file: file }));
+            }
+        }
 
         function polyfills(c,fn) {
             var p=poly(c);
