@@ -564,6 +564,9 @@ var inclusionsBegin;
             var enumerable = name.split("#");
             if (enumerable.length>1) name = enumerable.join('');enumerable=enumerable.length>1;
 
+            // use "@" in a name to flag it for preservation
+            // (minifiers can remove the function name itself, so as the name is in string it's safe tor that
+            // we need the name to contruct the getter name)
             var
             fn_name = name.split("@");
             if (fn_name.length>1) name = fn_name.join('');
