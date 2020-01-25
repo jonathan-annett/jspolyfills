@@ -505,8 +505,12 @@ var inclusionsBegin;
             }
         }
 
-        function polyfills(c,fn) {
-            var p=poly(c);
+        function polyfills(c,s,fn) {
+            if (typeof s==='function' && typeof fn==='undefined'){
+                fn=s;
+                s=undefined;
+            }
+            var p=poly(c,s);
             fn(p);
             p.install();
         }
@@ -601,6 +605,7 @@ var inclusionsBegin;
 
         }
 
+
         function polyfill_install(polyfills,prefix) {
             if (typeof polyfills!=='object') throw new Error('invalid polyfills wrapper');
             if (typeof polyfills._target==='undefined') throw new Error('missing polyfills target');
@@ -626,8 +631,34 @@ var inclusionsBegin;
             Object.defineProperties(target,polyfills);
         }
 
-        function poly(c) {
-            var proto,cls = {
+        function apply_shim(polyfills,name,fn){
+            if (
+                typeof polyfills._target!=='undefined'&&
+                typeof name==='string'&&
+                typeof fn!=='undefined'&&typeof fn===typeof polyfills._target[name]) {
+                    Object.defineProperties(fn,{__native:{
+                       value:polyfills._target[name],enumerable:false,configurable:true
+                    }});
+                } else {
+                    throw new Error('unexpected or mismatched types in apply_shim');
+                }
+            return polyfill_define(polyfills,'!'+name,fn);
+        }
+
+
+        function poly(c,s) {
+            if (isNode && typeof c==='string'&&typeof s==='undefined') {
+                s=require(c);
+                if (typeof s.name==='undefined') s.name=c;
+                c=Object;
+                // eg poly('fs') --> poly (Object,require('fs'))
+            } else if (typeof c==='object'&& ['string','undefined'].indexOf(typeof s)>=0) {
+                if (typeof c.name==='undefined' && typeof s==='string') c.name=s.name;
+                s=c;
+                c=Object;
+                //eg poly(require('fs'),'fs'); --> poly (Object,require('fs'))
+            } else s=undefined;
+            var proto,single,cls = {
               _target: c,
               _name:c.name,
               _proto : function() {
@@ -641,18 +672,52 @@ var inclusionsBegin;
               _install : function (){
                   delete cls._install;
                   delete cls._proto;
+                  delete cls._single;
                   polyfill_install(cls,c.name+".");
                   if (proto) {
-                    polyfill_install(proto,c.name+".prototype.");
+                    polyfill_install(proto,proto._name);
+                  }
+                  if (single) {
+                    polyfill_install(single,single._name);
                   }
               }
             };
             function polyfill (name,fn){ return polyfill_define(cls,name,fn); }
+            polyfill.shim = apply_shim.bind(this,cls);
             polyfill.prototype = function (name,fn) {
                 if (!!cls._proto) {cls._proto();}
                 polyfill.prototype = polyfill_define.bind(this,proto);
-                return polyfill.prototype(name,fn);
+                polyfill.prototype.shim = apply_shim.bind(this,proto);
+                return name&&fn ? polyfill.prototype(name,fn):undefined;
             };
+            polyfill.prototype.shim = function(nm,fn) {
+                polyfill.prototype();// swizzle out the 'proto' object
+                // polyfill.prototype now points to a newly bound function
+                return polyfill.prototype.shim(nm,fn);
+            }
+            polyfill.prototype.shim = apply_shim.bind(this,proto);
+            if (s) {
+                cls._single = function () {
+                      single =  {
+                          _target: s,
+                          _name:s.name
+                      };
+                      delete cls._single;
+                      return single;
+                    };
+                polyfill.singleton = function(name,fn){
+                    if (!!cls._single) {cls._single();}
+                    polyfill.singleton = polyfill_define.bind(this,single);
+                    polyfill.singleton.shim = apply_shim.bind(this,single);
+                    return name&&fn?polyfill.singleton(name,fn):undefined;
+                };
+                polyfill.singleton.shim = function(nm,fn) {
+                    polyfill.singleton();// swizzle out the 'single' object
+                    // polyfill.singleton.shim now points to a newly bound function
+                    return polyfill.singleton.shim(nm,fn);
+                }
+            }
+
             polyfill.install=cls._install;
             polyfill.class=polyfill;
             return polyfill;
