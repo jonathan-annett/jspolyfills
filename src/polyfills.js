@@ -637,12 +637,12 @@ var inclusionsBegin;
                 typeof name==='string'&&
                 typeof fn!=='undefined'&&typeof fn===typeof polyfills._target[name]) {
                     Object.defineProperties(fn,{__native:{
-                       value:polyfills._target[name],enumerable:false,configurable:true
+                       value:polyfills._target[name],enumerable:true,configurable:true
                     }});
                 } else {
                     throw new Error('unexpected or mismatched types in apply_shim');
                 }
-            return polyfill_define(polyfills,'!'+name,fn);
+            return polyfill_define(polyfills,'!#'+name,fn);
         }
 
 
